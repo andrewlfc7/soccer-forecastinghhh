@@ -29,7 +29,7 @@ jobs:
       - name: Login to GAR
         uses: docker/login-action@v3
         with:
-          registry: '${{ env.GAR_LOCATION }}-docker.pkg.dev'
+          registry: '${{ env.GAR_LOCATION }}.gcr.io'
           username: _json_key
           password: ${{ secrets.GOOGLE_CREDENTIALS }}
 
@@ -43,3 +43,5 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v0
         with:
           service: ${{ env.SERVICE }}
+          image: ${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}
+
