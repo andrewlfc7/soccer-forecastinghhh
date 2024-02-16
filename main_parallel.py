@@ -17,7 +17,6 @@ from google.cloud import storage
 from io import BytesIO
 import datetime
 
-
 def main():
 
     os.environ['GOOGLE_APPLICATION_CREDENTIALS']='careful-aleph-398521-3eb70ef00c68.json'
