@@ -1,4 +1,4 @@
-name: Build and Deploy to Cloud Run
+name: Build and Deploy Job to Cloud Run
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 env:
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
   GAR_LOCATION: ${{ secrets.GAR_LOCATION }}
-  SERVICE: ${{ secrets.SERVICE }}
+  JOB: ${{ secrets.JOB }}
 
 jobs:
   deploy:
@@ -35,13 +35,12 @@ jobs:
 
       - name: Build and Push Container
         run: |
-          docker build -t "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}" ./
-          docker push "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}"
+          docker build -t "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}" ./
+          docker push "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}"
 
-      - name: Deploy to Cloud Run
+      - name: Deploy Job to Cloud Run
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v0
         with:
-          service: ${{ env.SERVICE }}
-          image: ${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}
-
+          job: ${{ env.JOB }}
+          image: ${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}
