@@ -42,6 +42,7 @@ jobs:
         run: |
           gcloud run deploy ${{ env.JOB }} \
             --image="${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}" \
+            --region=us-central1 \
             --platform=managed \
             --quiet \
             --project=${{ env.PROJECT_ID }}
