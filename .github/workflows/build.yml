@@ -1,5 +1,3 @@
-name: Build and Deploy Job to Cloud Run
-
 on:
   push:
     branches: [main]
@@ -38,11 +36,6 @@ jobs:
           docker build -t "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}" ./
           docker push "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}"
 
-      - name: Deploy Job to Cloud Run
+      - name: Update Cloud Run Job Image
         run: |
-          gcloud run deploy ${{ env.JOB }} \
-            --image="${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}" \
-            --region=us-central1 \
-            --platform=managed \
-            --quiet \
-            --project=${{ env.PROJECT_ID }}
+          gcloud run jobs update ${{ env.JOB }} --image "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}"
