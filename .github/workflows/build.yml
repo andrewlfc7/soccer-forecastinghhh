@@ -39,8 +39,9 @@ jobs:
           docker push "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}"
 
       - name: Deploy Job to Cloud Run
-        id: deploy
-        uses: google-github-actions/deploy-cloudrun@v0
-        with:
-          job: ${{ env.JOB }}
-          image: ${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}
+        run: |
+          gcloud run deploy ${{ env.JOB }} \
+            --image="${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}" \
+            --platform=managed \
+            --quiet \
+            --project=${{ env.PROJECT_ID }}
