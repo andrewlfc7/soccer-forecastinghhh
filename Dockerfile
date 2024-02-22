@@ -27,6 +27,6 @@ EXPOSE 80
 
 # Command to run the application
 
-CMD ["sh", "-c", "python3 main_parallel.py"]
+CMD ["sh", "-c", "export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS && python3 main_parallel.py"]
 
 
