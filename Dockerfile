@@ -19,6 +19,10 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # Set the environment variable
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
+ARG GOOGLE_APPLICATION_CREDENTIALS
+ENV GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS
+
+
 EXPOSE 80
 
 # Command to run the application
