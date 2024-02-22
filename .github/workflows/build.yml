@@ -6,6 +6,7 @@ env:
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
   GAR_LOCATION: ${{ secrets.GAR_LOCATION }}
   JOB: ${{ secrets.JOB }}
+  REGION: us-central1
 
 jobs:
   deploy:
@@ -46,5 +47,11 @@ jobs:
 
       - name: Update Cloud Run Job Image
         run: |
-          gcloud run jobs update ${{ env.JOB }} --image "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}"
+          gcloud run jobs update ${{ env.JOB }} \
+            --image "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}" \
+            --region "${{ env.REGION }}"
+
+#      - name: Update Cloud Run Job Image
+#        run: |
+#          gcloud run jobs update ${{ env.JOB }} --image "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}"
 
