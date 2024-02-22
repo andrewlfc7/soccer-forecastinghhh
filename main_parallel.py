@@ -21,7 +21,7 @@ import datetime
 
 def main():
 
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS']='secrets/careful-aleph-398521-3eb70ef00c68.json'
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS']='/app/secrets/careful-aleph-398521-3eb70ef00c68.json'
 
     storage_client = storage.Client()
     bucket_name = "soccer-forecasting"
