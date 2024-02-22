@@ -27,20 +27,18 @@ jobs:
         with:
           credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
 
-      # Build and push Docker image to Container Registry
       - name: Build and Push Container
         run: |
-          # Fetch the content of the service account key file and store it in a temporary file
-          echo ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }} > /tmp/google-credentials.json
+          # Fetch the content of the correct service account key file and store it in a temporary file
+          echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" > /tmp/google-credentials.json
 
-          # Build the Docker image and include the service account key file
+          # Build the Docker image and include the correct service account key file
           docker build \
             --build-arg GOOGLE_APPLICATION_CREDENTIALS="/app/secrets/careful-aleph-398521-3eb70ef00c68.json" \
             -t "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}" ./
 
           # Push the Docker image to the Container Registry
           docker push "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}"
-
       # Update Cloud Run Job Image
       - name: Update Cloud Run Job Image
         run: |
