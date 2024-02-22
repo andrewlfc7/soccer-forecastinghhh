@@ -30,7 +30,7 @@ jobs:
       - name: Build and Push Container
         run: |
           # Fetch the content of the correct service account key file and store it in a temporary file
-          echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" > /tmp/google-credentials.json
+          echo "${{ secrets.GOOGLE_CREDENTIALS }}" > /tmp/google-credentials.json
 
           # Build the Docker image and include the correct service account key file
           docker build \
