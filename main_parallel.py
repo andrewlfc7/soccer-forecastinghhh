@@ -21,6 +21,38 @@ import datetime
 
 def main():
 
+
+
+    # Get the parent directory of the script's directory
+    parent_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    # Specify the parent directory path where the secret is mounted
+    parent_mount_path = '/soccer-forecasting/'
+
+    # Specify the path relative to the parent mount path where the secret file is located
+    secret_relative_path = 'forecasting-key'
+
+    # Construct the full path to the secret file
+    key_file_path = os.path.join(parent_directory, parent_mount_path, secret_relative_path)
+
+    # Check if the file exists
+    if os.path.exists(key_file_path):
+        # Read the contents of the file
+        with open(key_file_path, 'r') as key_file:
+            key_data = key_file.read()
+
+        # Assuming the key data is in JSON format
+        key_json = json.loads(key_data)
+
+        # Use key_json as needed in your code
+        # For example, you can access individual keys like key_json['key_name']
+
+        # Assuming GOOGLE_APPLICATION_CREDENTIALS is expected to contain the service account key path
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_file_path
+    else:
+        print("Error: Scraper key file not found at", key_file_path)
+
+
     # os.environ['GOOGLE_APPLICATION_CREDENTIALS']='/app/secrets/careful-aleph-398521-3eb70ef00c68.json'
 
     storage_client = storage.Client()
