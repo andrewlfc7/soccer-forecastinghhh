@@ -134,7 +134,7 @@ def main():
 
     # Perform simulations in parallel
     match_probs = Parallel(n_jobs=num_jobs)(
-        delayed(simulate_match_current_round)(match, upcoming_games, model_params, 100)
+        delayed(simulate_match_current_round)(match, upcoming_games, model_params, 1000)
         for match in upcoming_games['matchId']
     )
 
@@ -181,7 +181,7 @@ def main():
     shots_data['expectedGoals'] = shots_data['expectedGoals'].fillna(0)
     shots_data = shots_data.replace({'Tottenham': 'Tottenham Hotspur'})
 
-    played_result,played_tables_drop_columns,unplayed_result,simulated_tables = run_simulations_parallel(100, shots_data, remaining_matches, model_params)
+    played_result,played_tables_drop_columns,unplayed_result,simulated_tables = run_simulations_parallel(1000, shots_data, remaining_matches, model_params)
 
     played_result['matchId'] = played_result['matchId'].astype(int)
 
