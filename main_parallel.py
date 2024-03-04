@@ -44,16 +44,11 @@ def main():
         # Assuming the key data is in JSON format
         key_json = json.loads(key_data)
 
-        # Use key_json as needed in your code
-        # For example, you can access individual keys like key_json['key_name']
-
-        # Assuming GOOGLE_APPLICATION_CREDENTIALS is expected to contain the service account key path
         os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_file_path
     else:
         print("Error: Scraper key file not found at", key_file_path)
 
 
-    # os.environ['GOOGLE_APPLICATION_CREDENTIALS']='/app/secrets/careful-aleph-398521-3eb70ef00c68.json'
 
     storage_client = storage.Client()
     bucket_name = "soccer-forecasting"
@@ -129,9 +124,7 @@ def main():
         outcome_probs = iterate_k_simulations_upcoming_matches(match, upcoming_games, model_params, num_simulations)
         return outcome_probs
 
-    # Number of parallel jobs, adjust as needed
-    num_jobs = -1  # Use all available CPU cores, set to a specific number if needed
-
+    num_jobs = -1  
     # Perform simulations in parallel
     match_probs = Parallel(n_jobs=num_jobs)(
         delayed(simulate_match_current_round)(match, upcoming_games, model_params, 1000)
@@ -151,7 +144,7 @@ def main():
     figure_buffer_matchround_forecast = BytesIO()
     matchround_forecast(df=merged_df, league='EPL', fotmob_leagueid=47,cmap='ODD').savefig(
         figure_buffer_matchround_forecast,
-        format="png",  # Use the appropriate format for your figure
+        format="png", 
         dpi=600,
         bbox_inches="tight",
         edgecolor="none",
@@ -181,7 +174,7 @@ def main():
     shots_data['expectedGoals'] = shots_data['expectedGoals'].fillna(0)
     shots_data = shots_data.replace({'Tottenham': 'Tottenham Hotspur'})
 
-    played_result,played_tables_drop_columns,unplayed_result,simulated_tables = run_simulations_parallel(1000, shots_data, remaining_matches, model_params)
+    played_result,played_tables_drop_columns,unplayed_result,simulated_tables = run_simulations_parallel(200, shots_data, remaining_matches, model_params)
 
     played_result['matchId'] = played_result['matchId'].astype(int)
 
@@ -217,7 +210,7 @@ def main():
     figure_buffer_xpt_table = BytesIO()
     xpt_table(xPoints_table, league_name='English Premier League').savefig(
         figure_buffer_xpt_table,
-        format="png",  # Use the appropriate format for your figure
+        format="png",  
         dpi=600,
         bbox_inches="tight",
         edgecolor="none",
@@ -230,7 +223,7 @@ def main():
     figure_buffer_eos_distribution = BytesIO()
     eos_distribution_v1(simulated_tables, league_name).savefig(
         figure_buffer_eos_distribution,
-        format="png",  # Use the appropriate format for your figure
+        format="png",  
         dpi=600,
         bbox_inches="tight",
         edgecolor="none",
@@ -242,7 +235,7 @@ def main():
     figure_buffer_eos_table = BytesIO()
     plot_eos_table_v1(updated_sim_table, league_name).savefig(
         figure_buffer_eos_table,
-        format="png",  # Use the appropriate format for your figure
+        format="png", 
         dpi=600,
         bbox_inches="tight",
         edgecolor="none",
@@ -254,7 +247,7 @@ def main():
     figure_buffer_finishing_position = BytesIO()
     plot_finishing_position_distribution(position_prob, league_name).savefig(
         figure_buffer_finishing_position,
-        format="png",  # Use the appropriate format for your figure
+        format="png",  
         dpi=600,
         bbox_inches="tight",
         edgecolor="none",
