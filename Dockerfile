@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.9
 
 LABEL authors="andrew"
 
@@ -19,14 +19,11 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # Set the environment variable
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
-ARG GOOGLE_APPLICATION_CREDENTIALS
-ENV GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS
 
 
 EXPOSE 80
 
 # Command to run the application
 
-CMD ["sh", "-c", "export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS && python3 main_parallel.py"]
-
+CMD ["sh", "-c", "python3 main_parallel.py"]
 
