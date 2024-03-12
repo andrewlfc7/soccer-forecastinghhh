@@ -1190,7 +1190,7 @@ def run_simulations_parallel(n_simulations, shot_df, remaining_games, model_para
         simulated_data = iterate_k_simulations(matchId, shot_df, model_params, 1)
         simulated_data['simulation_id'] = simulation_id
         nested_data = pd.DataFrame([simulated_data])
-        nested_data= nested_data.groupby('matchId').tail(1)
+    
         nested_data_drop_columns = nested_data.drop(columns=['home_prob', 'draw_prob', 'away_prob'])
         return nested_data, nested_data_drop_columns
 
