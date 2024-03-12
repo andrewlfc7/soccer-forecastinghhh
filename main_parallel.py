@@ -3,24 +3,17 @@ from pipeline.model import *
 from pipeline.visuals import *
 from pipeline.sim import *
 from pipeline.utils import *
-import os
 from joblib import Parallel, delayed
 
 import joblib
-import yaml
 from utils import *
 import pandas as pd
-import matplotlib.pyplot as plt
-from sqlalchemy import create_engine,exc
-import sqlalchemy
 from google.cloud import storage
 from io import BytesIO
 import datetime
 
 
-
 def main():
-
 
 
     # Get the parent directory of the script's directory
@@ -37,11 +30,8 @@ def main():
 
     # Check if the file exists
     if os.path.exists(key_file_path):
-        # Read the contents of the file
         with open(key_file_path, 'r') as key_file:
             key_data = key_file.read()
-
-        # Assuming the key data is in JSON format
         key_json = json.loads(key_data)
 
         os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_file_path
@@ -71,10 +61,27 @@ def main():
     fixtures_data = get_league_fixtures(league_id)
 
     match_rounds = fixtures_data['matches']['allMatches']
-    current_round = fixtures_data['matches']['firstUnplayedMatch']['firstRoundWithUnplayedMatch']
     season_length = len(fixtures_data['matches']['allMatches'])
 
     today = datetime.date.today().strftime("%Y%m%d")
+#%%
+    def get_current_match_round(fixtures_data):
+        if 'hasOngoingMatch' in fixtures_data and fixtures_data['hasOngoingMatch']:
+            return "There is an ongoing match."
+
+        if 'allMatches' in fixtures_data['matches']:
+            last_finished_match_round = None
+            for match in fixtures_data['matches']['allMatches']:
+                if 'status' in match and match['status'].get('finished', False):
+                    last_finished_match_round = match['round']
+
+            if last_finished_match_round is not None:
+                return last_finished_match_round
+
+        return "No ongoing matches, but unable to determine the current match round."
+
+    current_round = get_current_match_round(fixtures_data)
+
 
     if are_all_matches_finished(season_length, match_rounds, current_round):
         print(f"All matches in round {current_round - 1} are finished.")
@@ -124,10 +131,12 @@ def main():
         outcome_probs = iterate_k_simulations_upcoming_matches(match, upcoming_games, model_params, num_simulations)
         return outcome_probs
 
-    num_jobs = -1  
+    # Number of parallel jobs, adjust as needed
+    num_jobs = -1  # Use all available CPU cores, set to a specific number if needed
+
     # Perform simulations in parallel
     match_probs = Parallel(n_jobs=num_jobs)(
-        delayed(simulate_match_current_round)(match, upcoming_games, model_params, 1000)
+        delayed(simulate_match_current_round)(match, upcoming_games, model_params, 100)
         for match in upcoming_games['matchId']
     )
 
@@ -144,7 +153,7 @@ def main():
     figure_buffer_matchround_forecast = BytesIO()
     matchround_forecast(df=merged_df, league='EPL', fotmob_leagueid=47,cmap='ODD').savefig(
         figure_buffer_matchround_forecast,
-        format="png", 
+        format="png",  # Use the appropriate format for your figure
         dpi=600,
         bbox_inches="tight",
         edgecolor="none",
@@ -174,7 +183,7 @@ def main():
     shots_data['expectedGoals'] = shots_data['expectedGoals'].fillna(0)
     shots_data = shots_data.replace({'Tottenham': 'Tottenham Hotspur'})
 
-    played_result,played_tables_drop_columns,unplayed_result,simulated_tables = run_simulations_parallel(200, shots_data, remaining_matches, model_params)
+    played_result,played_tables_drop_columns,unplayed_result,simulated_tables = run_simulations_parallel(100, shots_data, remaining_matches, model_params)
 
     played_result['matchId'] = played_result['matchId'].astype(int)
 
@@ -210,7 +219,7 @@ def main():
     figure_buffer_xpt_table = BytesIO()
     xpt_table(xPoints_table, league_name='English Premier League').savefig(
         figure_buffer_xpt_table,
-        format="png",  
+        format="png",  # Use the appropriate format for your figure
         dpi=600,
         bbox_inches="tight",
         edgecolor="none",
@@ -223,7 +232,7 @@ def main():
     figure_buffer_eos_distribution = BytesIO()
     eos_distribution_v1(simulated_tables, league_name).savefig(
         figure_buffer_eos_distribution,
-        format="png",  
+        format="png",  # Use the appropriate format for your figure
         dpi=600,
         bbox_inches="tight",
         edgecolor="none",
@@ -235,7 +244,7 @@ def main():
     figure_buffer_eos_table = BytesIO()
     plot_eos_table_v1(updated_sim_table, league_name).savefig(
         figure_buffer_eos_table,
-        format="png", 
+        format="png",  # Use the appropriate format for your figure
         dpi=600,
         bbox_inches="tight",
         edgecolor="none",
@@ -247,7 +256,7 @@ def main():
     figure_buffer_finishing_position = BytesIO()
     plot_finishing_position_distribution(position_prob, league_name).savefig(
         figure_buffer_finishing_position,
-        format="png",  
+        format="png",  # Use the appropriate format for your figure
         dpi=600,
         bbox_inches="tight",
         edgecolor="none",

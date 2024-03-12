@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM python:3.11
 
 LABEL authors="andrew"
 
@@ -19,11 +19,10 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # Set the environment variable
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
-
-
 EXPOSE 80
 
 # Command to run the application
 
 CMD ["sh", "-c", "python3 main_parallel.py"]
+
 

@@ -1,7 +1,8 @@
 import requests
 import json
 import os
-from pipeline.sim import iterate_k_simulations_upcoming_matches
+
+
 def are_all_matches_finished(season_length, match_round, current_round):
     match_ids = []
 
@@ -35,7 +36,6 @@ def is_model_built(league_name):
     model_path = f'model/model{league_name}.pkl'
     return os.path.exists(model_path)
 
-import pandas as pd
 
 def get_remaining_matches(shots_data, all_fixtures_df):
     # Step 1: Get unique match IDs from shots_data
