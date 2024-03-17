@@ -7,9 +7,11 @@ import json
 import pandas as pd
 import asyncio
 
+
+
 eastern = pytz.timezone('US/Eastern')
-today = datetime.datetime.now(eastern).date()
-today = today.strftime('%Y-%m-%d')
+today = datetime.datetime.now(eastern)
+today= today.strftime('%Y%m%d')
 
 
 parent_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
