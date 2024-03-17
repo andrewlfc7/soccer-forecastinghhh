@@ -88,7 +88,6 @@ client = storage.Client()
 bucket_name = "soccer-forecasting"
 folder_prefix = f'figures/{today}/'
 
-bucket = client.get_bucket(bucket_name)
 
 if not os.path.exists('figures'):
     os.makedirs('figures')
@@ -115,6 +114,10 @@ eos_sim = [
     'figures/finishing_position_odds_English Premier League.png',
     'figures/20240312/eos_table_English Premier League.png'
 ]
+
+print(xpoints)
+
+print(eos_sim)
 
 tweet_images(api, xpoints, tweet='Expected Points Table')
 
