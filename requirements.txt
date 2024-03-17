@@ -32,6 +32,6 @@ scikit-learn
 psycopg2-binary
 
 google-cloud-storage
-
+datetime
 pytz
 pyarrow

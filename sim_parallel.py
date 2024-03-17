@@ -16,19 +16,14 @@ import datetime
 def main():
 
 
-    # Get the parent directory of the script's directory
     parent_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    # Specify the parent directory path where the secret is mounted
     parent_mount_path = '/soccer-forecasting/'
 
-    # Specify the path relative to the parent mount path where the secret file is located
     secret_relative_path = 'forecasting-key'
 
-    # Construct the full path to the secret file
     key_file_path = os.path.join(parent_directory, parent_mount_path, secret_relative_path)
 
-    # Check if the file exists
     if os.path.exists(key_file_path):
         with open(key_file_path, 'r') as key_file:
             key_data = key_file.read()
@@ -90,7 +85,6 @@ def main():
 
     all_matches_data = fixtures_data['matches']['allMatches']
 
-    # Use pd.json_normalize to convert the nested JSON data to a flat DataFrame
     df = pd.json_normalize(all_matches_data)
     df_v1=remove_aborted_matches(df)
 
@@ -136,7 +130,7 @@ def main():
 
     # Perform simulations in parallel
     match_probs = Parallel(n_jobs=num_jobs)(
-        delayed(simulate_match_current_round)(match, upcoming_games, model_params, 100)
+        delayed(simulate_match_current_round)(match, upcoming_games, model_params, 20)
         for match in upcoming_games['matchId']
     )
 
@@ -153,7 +147,7 @@ def main():
     figure_buffer_matchround_forecast = BytesIO()
     matchround_forecast(df=merged_df, league='EPL', fotmob_leagueid=47,cmap='ODD').savefig(
         figure_buffer_matchround_forecast,
-        format="png",  # Use the appropriate format for your figure
+        format="png",
         dpi=600,
         bbox_inches="tight",
         edgecolor="none",
@@ -161,10 +155,9 @@ def main():
     )
 
     figure_buffer_matchround_forecast.seek(0)
-    blob_path_matchround_forecast = f"figures/{today}/matchround_forecast_{league_name}_{today}.png"
+    blob_path_matchround_forecast = f"figures/{today}/matchround_forecast_{league_name}.png"
     blob_matchround_forecast = bucket.blob(blob_path_matchround_forecast)
     blob_matchround_forecast.upload_from_file(figure_buffer_matchround_forecast, content_type="image/png")
-    # Close the BytesIO buffers
     figure_buffer_matchround_forecast.close()
 
 
@@ -183,7 +176,7 @@ def main():
     shots_data['expectedGoals'] = shots_data['expectedGoals'].fillna(0)
     shots_data = shots_data.replace({'Tottenham': 'Tottenham Hotspur'})
 
-    played_result,played_tables_drop_columns,unplayed_result,simulated_tables = run_simulations_parallel(100, shots_data, remaining_matches, model_params)
+    played_result,played_tables_drop_columns,unplayed_result,simulated_tables = run_simulations_parallel(20, shots_data, remaining_matches, model_params)
 
     played_result['matchId'] = played_result['matchId'].astype(int)
 
@@ -219,7 +212,7 @@ def main():
     figure_buffer_xpt_table = BytesIO()
     xpt_table(xPoints_table, league_name='English Premier League').savefig(
         figure_buffer_xpt_table,
-        format="png",  # Use the appropriate format for your figure
+        format="png",
         dpi=600,
         bbox_inches="tight",
         edgecolor="none",
@@ -228,11 +221,11 @@ def main():
     figure_buffer_xpt_table.seek(0)
 
 
-    # Save eos_distribution plot to a BytesIO buffer
+
     figure_buffer_eos_distribution = BytesIO()
     eos_distribution_v1(simulated_tables, league_name).savefig(
         figure_buffer_eos_distribution,
-        format="png",  # Use the appropriate format for your figure
+        format="png",
         dpi=600,
         bbox_inches="tight",
         edgecolor="none",
@@ -240,11 +233,10 @@ def main():
     )
     figure_buffer_eos_distribution.seek(0)
 
-    # Save plot_eos_table plot to a BytesIO buffer
     figure_buffer_eos_table = BytesIO()
     plot_eos_table_v1(updated_sim_table, league_name).savefig(
         figure_buffer_eos_table,
-        format="png",  # Use the appropriate format for your figure
+        format="png",
         dpi=600,
         bbox_inches="tight",
         edgecolor="none",
@@ -252,11 +244,10 @@ def main():
     )
     figure_buffer_eos_table.seek(0)
 
-    # Save plot_finishing_position_distribution plot to a BytesIO buffer
     figure_buffer_finishing_position = BytesIO()
     plot_finishing_position_distribution(position_prob, league_name).savefig(
         figure_buffer_finishing_position,
-        format="png",  # Use the appropriate format for your figure
+        format="png",
         dpi=600,
         bbox_inches="tight",
         edgecolor="none",
@@ -265,14 +256,12 @@ def main():
     figure_buffer_finishing_position.seek(0)
 
 
-    # Specify the blob paths within the bucket using the plot names and the current date
-    blob_path_eos_distribution = f"figures/{today}/eos_distribution_{league_name}_{today}.png"
-    blob_path_eos_table = f"figures/{today}/eos_table_{league_name}_{today}.png"
-    blob_path_finishing_position = f"figures/{today}/finishing_position_odds_{league_name}_{today}.png"
-    blob_path_xpt_table = f"figures/{today}/xpt_table_{league_name}_{today}.png"
+    blob_path_eos_distribution = f"figures/{today}/eos_distribution_{league_name}.png"
+    blob_path_eos_table = f"figures/{today}/eos_table_{league_name}.png"
+    blob_path_finishing_position = f"figures/{today}/finishing_position_odds_{league_name}.png"
+    blob_path_xpt_table = f"figures/{today}/xpt_table_{league_name}.png"
 
 
-    # Create Blobs and upload the figures
     blob_eos_distribution = bucket.blob(blob_path_eos_distribution)
     blob_eos_distribution.upload_from_file(figure_buffer_eos_distribution, content_type="image/png")
 
@@ -285,7 +274,6 @@ def main():
     blob_xpt_table = bucket.blob(blob_path_xpt_table)
     blob_xpt_table.upload_from_file(figure_buffer_xpt_table, content_type="image/png")
 
-    # Close the BytesIO buffers
     figure_buffer_eos_distribution.close()
     figure_buffer_eos_table.close()
     figure_buffer_finishing_position.close()
