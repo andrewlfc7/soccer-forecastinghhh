@@ -5,6 +5,7 @@ import pytz
 from google.cloud import storage
 import json
 import pandas as pd
+import asyncio
 
 eastern = pytz.timezone('US/Eastern')
 today = datetime.datetime.now(eastern).date()
@@ -19,9 +20,6 @@ if os.path.exists(key_file_path):
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_file_path
 else:
     print("Error: postmatch key file not found at", key_file_path)
-
-
-
 
 def verify_twitter_credentials():
     """Verify twitter authentication"""
@@ -40,7 +38,7 @@ def verify_twitter_credentials():
 
     return api
 
-def tweet_images(api: tweepy.Client, images, tweet=''):
+async def tweet_images(api: tweepy.Client, images, tweet=''):
     """Upload image to Twitter with a tweet"""
 
     consumer_key = os.environ['API_KEY']
@@ -64,47 +62,44 @@ def tweet_images(api: tweepy.Client, images, tweet=''):
 
     return post_result
 
+async def main():
+    api = verify_twitter_credentials()
 
+    client = storage.Client()
 
+    bucket_name = "soccer-forecasting"
+    folder_prefix = f'figures/{today}/'
 
-api = verify_twitter_credentials()
+    bucket = client.get_bucket(bucket_name)
 
+    if not os.path.exists('figures'):
+        os.makedirs('figures')
 
-client = storage.Client()
+    blob_list_players = bucket.list_blobs(prefix=folder_prefix)
+    files = []
+    for blob in blob_list_players:
+        if not blob.name.endswith('/'):
+            file_name = os.path.basename(blob.name)
+            local_file_path = os.path.join('figures', file_name)
+            blob.download_to_filename(local_file_path)
+            files.append(local_file_path)
 
-bucket_name = "soccer-forecasting"
-folder_prefix = f'figures/{today}/'
+    xpoints = [
+        'figures/xpt_table_English Premier League.png'
+    ]
 
-bucket = client.get_bucket(bucket_name)
+    matchround = [
+        'figures/matchround_forecast_English Premier League.png'
+    ]
 
-if not os.path.exists('figures'):
-    os.makedirs('figures')
+    eos_sim = [
+        'figures/eos_distribution_English Premier League.png',
+        'figures/finishing_position_odds_English Premier League.png',
+        'figures/20240312/eos_table_English Premier League.png'
+    ]
 
-blob_list_players = bucket.list_blobs(prefix=folder_prefix)
-files = []
-for blob in blob_list_players:
-    if not blob.name.endswith('/'):
-        file_name = os.path.basename(blob.name)
-        local_file_path = os.path.join('figures', file_name)
-        blob.download_to_filename(local_file_path)
-        files.append(local_file_path)
+    await tweet_images(api, xpoints, tweet='Expected Points Table')
+    await tweet_images(api, matchround, tweet='Upcoming Match Round Forecast')
+    await tweet_images(api, eos_sim, tweet='EOS Simulation')
 
-xpoints = [
-    'figures/xpt_table_English Premier League.png'
-]
-
-matchround = [
-    'figures/matchround_forecast_English Premier League.png'
-]
-
-eos_sim = [
-    'figures/eos_distribution_English Premier League.png',
-    'figures/finishing_position_odds_English Premier League.png',
-    'figures/20240312/eos_table_English Premier League.png'
-]
-
-tweet_images(api, xpoints, tweet='Expected Points Table')
-
-tweet_images(api, matchround, tweet='Upcoming Match Round Forecast')
-
-tweet_images(api, eos_sim, tweet='EOS Simulation')
+asyncio.run(main())

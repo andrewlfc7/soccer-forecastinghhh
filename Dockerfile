@@ -8,21 +8,21 @@ WORKDIR /app
 # Copy everything from the context into the /app directory
 COPY . .
 
+RUN python3 -m venv /opt/venv
 
-# Install dependencies
 RUN apt-get update
 RUN apt-get install -y python3
 RUN apt-get install -y python3-pip
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN /opt/venv/bin/python -m pip install --no-cache-dir -r requirements.txt
 
 
-# Set the environment variable
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 EXPOSE 80
 
-# Command to run the application
 
-CMD ["sh", "-c", "python3 main_parallel.py"]
+
+
+CMD ["/opt/venv/bin/python", "main.py"]
 
 
