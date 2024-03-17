@@ -11,15 +11,23 @@ eastern = pytz.timezone('US/Eastern')
 today = datetime.datetime.now(eastern).date()
 today = today.strftime('%Y-%m-%d')
 
-key_file_path = '/Post_Match_Dashboard/postmatch-key'
+parent_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+parent_mount_path = '/soccer-forecasting/'
+
+secret_relative_path = 'forecasting-key'
+
+key_file_path = os.path.join(parent_directory, parent_mount_path, secret_relative_path)
 
 if os.path.exists(key_file_path):
     with open(key_file_path, 'r') as key_file:
         key_data = key_file.read()
     key_json = json.loads(key_data)
+
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_file_path
 else:
-    print("Error: postmatch key file not found at", key_file_path)
+    print("Error: forecasting key file not found at", key_file_path)
+
 
 def verify_twitter_credentials():
     """Verify twitter authentication"""

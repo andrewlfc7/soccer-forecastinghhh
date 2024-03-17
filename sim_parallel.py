@@ -31,7 +31,7 @@ def main():
 
         os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_file_path
     else:
-        print("Error: Scraper key file not found at", key_file_path)
+        print("Error: forecasting key file not found at", key_file_path)
 
 
 
