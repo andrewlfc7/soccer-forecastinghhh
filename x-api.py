@@ -11,6 +11,7 @@ eastern = pytz.timezone('US/Eastern')
 today = datetime.datetime.now(eastern).date()
 today = today.strftime('%Y-%m-%d')
 
+
 parent_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 parent_mount_path = '/soccer-forecasting/'
@@ -27,6 +28,12 @@ if os.path.exists(key_file_path):
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_file_path
 else:
     print("Error: forecasting key file not found at", key_file_path)
+
+
+
+storage_client = storage.Client()
+bucket_name = "soccer-forecasting"
+bucket = storage_client.get_bucket(bucket_name)
 
 
 def verify_twitter_credentials():
@@ -70,44 +77,49 @@ async def tweet_images(api: tweepy.Client, images, tweet=''):
 
     return post_result
 
-async def main():
-    api = verify_twitter_credentials()
 
-    client = storage.Client()
 
-    bucket_name = "soccer-forecasting"
-    folder_prefix = f'figures/{today}/'
 
-    bucket = client.get_bucket(bucket_name)
+api = verify_twitter_credentials()
 
-    if not os.path.exists('figures'):
-        os.makedirs('figures')
 
-    blob_list_players = bucket.list_blobs(prefix=folder_prefix)
-    files = []
-    for blob in blob_list_players:
-        if not blob.name.endswith('/'):
-            file_name = os.path.basename(blob.name)
-            local_file_path = os.path.join('figures', file_name)
-            blob.download_to_filename(local_file_path)
-            files.append(local_file_path)
+client = storage.Client()
 
-    xpoints = [
-        'figures/xpt_table_English Premier League.png'
-    ]
+bucket_name = "soccer-forecasting"
+folder_prefix = f'figures/{today}/'
 
-    matchround = [
-        'figures/matchround_forecast_English Premier League.png'
-    ]
+bucket = client.get_bucket(bucket_name)
 
-    eos_sim = [
-        'figures/eos_distribution_English Premier League.png',
-        'figures/finishing_position_odds_English Premier League.png',
-        'figures/20240312/eos_table_English Premier League.png'
-    ]
+if not os.path.exists('figures'):
+    os.makedirs('figures')
 
-    await tweet_images(api, xpoints, tweet='Expected Points Table')
-    await tweet_images(api, matchround, tweet='Upcoming Match Round Forecast')
-    await tweet_images(api, eos_sim, tweet='EOS Simulation')
+blob_list_players = bucket.list_blobs(prefix=folder_prefix)
+files = []
+for blob in blob_list_players:
+    if not blob.name.endswith('/'):
+        file_name = os.path.basename(blob.name)
+        local_file_path = os.path.join('figures', file_name)
+        blob.download_to_filename(local_file_path)
+        files.append(local_file_path)
 
-asyncio.run(main())
+xpoints = [
+    'figures/xpt_table_English Premier League.png'
+]
+
+matchround = [
+    'figures/matchround_forecast_English Premier League.png'
+]
+
+eos_sim = [
+    'figures/eos_distribution_English Premier League.png',
+    'figures/finishing_position_odds_English Premier League.png',
+    'figures/20240312/eos_table_English Premier League.png'
+]
+
+tweet_images(api, xpoints, tweet='Expected Points Table')
+
+tweet_images(api, matchround, tweet='Upcoming Match Round Forecast')
+
+tweet_images(api, eos_sim, tweet='EOS Simulation')
+
+
