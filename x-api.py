@@ -101,23 +101,25 @@ for blob in blob_list_players:
         blob.download_to_filename(local_file_path)
         files.append(local_file_path)
 
-xpoints = [
-    'figures/xpt_table_English Premier League.png'
-]
 
-matchround = [
-    'figures/matchround_forecast_English Premier League.png'
-]
+xpoints = []
+matchround = []
+eos_sim = []
 
-eos_sim = [
-    'figures/eos_distribution_English Premier League.png',
-    'figures/finishing_position_odds_English Premier League.png',
-    'figures/20240312/eos_table_English Premier League.png'
-]
+figures_directory = os.path.join(parent_directory, 'figures')
 
-print(xpoints)
+for file in os.listdir(figures_directory):
+    if file.endswith('.png'):
+        if 'xpt_table' in file:
+            xpoints.append(os.path.join(figures_directory, file))
+        elif 'matchround_forecast' in file:
+            matchround.append(os.path.join(figures_directory, file))
+        elif 'eos_distribution' in file or 'finishing_position_odds' in file or 'eos_table' in file:
+            eos_sim.append(os.path.join(figures_directory, file))
 
-print(eos_sim)
+print("xpoints:", xpoints)
+print("matchround:", matchround)
+print("eos_sim:", eos_sim)
 
 tweet_images(api, xpoints, tweet='Expected Points Table')
 
