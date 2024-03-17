@@ -53,7 +53,7 @@ def verify_twitter_credentials():
 
     return api
 
-async def tweet_images(api: tweepy.Client, images, tweet=''):
+def tweet_images(api: tweepy.Client, images, tweet=''):
     """Upload image to Twitter with a tweet"""
 
     consumer_key = os.environ['API_KEY']
