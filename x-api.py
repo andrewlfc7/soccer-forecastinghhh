@@ -11,6 +11,10 @@ eastern = pytz.timezone('US/Eastern')
 today = datetime.datetime.now(eastern).date()
 today = today.strftime('%Y-%m-%d')
 
+if not os.path.exists('figures'):
+    os.makedirs('figures')
+
+
 parent_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 parent_mount_path = '/soccer-forecasting/'
@@ -80,8 +84,6 @@ client = storage.Client()
 bucket_name = "soccer-forecasting"
 folder_prefix = f'figures/{today}/'
 
-if not os.path.exists('figures'):
-    os.makedirs('figures')
 
 blob_list_players = bucket.list_blobs(prefix=folder_prefix)
 files = []
@@ -112,7 +114,7 @@ matchround = [matchround_path]
 eos_sim = [eos_distribution_path, finishing_position_odds_path, eos_table_path]
 
 print("Files in figures directory:", os.listdir('figures'))
+tweet_images(api, eos_sim, tweet='EOS Simulation')
 
 tweet_images(api, matchround, tweet='Upcoming Match Round Forecast')
 tweet_images(api, xpoints, tweet='Expected Points Table')
-tweet_images(api, eos_sim, tweet='EOS Simulation')
