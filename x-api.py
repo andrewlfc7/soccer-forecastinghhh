@@ -111,7 +111,6 @@ xpoints = [xpoint_path]
 matchround = [matchround_path]
 eos_sim = [eos_distribution_path, finishing_position_odds_path, eos_table_path]
 
-# Post images to Twitter
-tweet_images(api, xpoints, tweet='Expected Points Table')
 tweet_images(api, matchround, tweet='Upcoming Match Round Forecast')
+tweet_images(api, xpoints, tweet='Expected Points Table')
 tweet_images(api, eos_sim, tweet='EOS Simulation')
