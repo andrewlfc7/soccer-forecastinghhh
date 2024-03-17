@@ -11,7 +11,6 @@ eastern = pytz.timezone('US/Eastern')
 today = datetime.datetime.now(eastern).date()
 today = today.strftime('%Y-%m-%d')
 
-
 parent_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 parent_mount_path = '/soccer-forecasting/'
@@ -28,8 +27,6 @@ if os.path.exists(key_file_path):
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_file_path
 else:
     print("Error: forecasting key file not found at", key_file_path)
-
-
 
 storage_client = storage.Client()
 bucket_name = "soccer-forecasting"
@@ -77,17 +74,11 @@ def tweet_images(api: tweepy.Client, images, tweet=''):
 
     return post_result
 
-
-
-
 api = verify_twitter_credentials()
 
-
 client = storage.Client()
-
 bucket_name = "soccer-forecasting"
 folder_prefix = f'figures/{today}/'
-
 
 if not os.path.exists('figures'):
     os.makedirs('figures')
@@ -101,30 +92,26 @@ for blob in blob_list_players:
         blob.download_to_filename(local_file_path)
         files.append(local_file_path)
 
+# Define filenames
+xpoint_filename = 'xpt_table_English Premier League.png'
+matchround_filename = 'matchround_forecast_English Premier League.png'
+eos_distribution_filename = 'eos_distribution_English Premier League.png'
+finishing_position_odds_filename = 'finishing_position_odds_English Premier League.png'
+eos_table_filename = 'eos_table_English Premier League.png'
 
-xpoints = []
-matchround = []
-eos_sim = []
+# Construct file paths
+xpoint_path = os.path.join('figures', xpoint_filename)
+matchround_path = os.path.join('figures', matchround_filename)
+eos_distribution_path = os.path.join('figures', eos_distribution_filename)
+finishing_position_odds_path = os.path.join('figures', finishing_position_odds_filename)
+eos_table_path = os.path.join('figures', eos_table_filename)
 
-figures_directory = os.path.join(parent_directory, 'figures')
+# Prepare lists for image paths
+xpoints = [xpoint_path]
+matchround = [matchround_path]
+eos_sim = [eos_distribution_path, finishing_position_odds_path, eos_table_path]
 
-for file in os.listdir(figures_directory):
-    if file.endswith('.png'):
-        if 'xpt_table' in file:
-            xpoints.append(os.path.join(figures_directory, file))
-        elif 'matchround_forecast' in file:
-            matchround.append(os.path.join(figures_directory, file))
-        elif 'eos_distribution' in file or 'finishing_position_odds' in file or 'eos_table' in file:
-            eos_sim.append(os.path.join(figures_directory, file))
-
-print("xpoints:", xpoints)
-print("matchround:", matchround)
-print("eos_sim:", eos_sim)
-
+# Post images to Twitter
 tweet_images(api, xpoints, tweet='Expected Points Table')
-
 tweet_images(api, matchround, tweet='Upcoming Match Round Forecast')
-
 tweet_images(api, eos_sim, tweet='EOS Simulation')
-
-
