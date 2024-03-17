@@ -11,9 +11,6 @@ eastern = pytz.timezone('US/Eastern')
 today = datetime.datetime.now(eastern).date()
 today = today.strftime('%Y-%m-%d')
 
-if not os.path.exists('figures'):
-    os.makedirs('figures')
-
 
 parent_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -84,15 +81,18 @@ client = storage.Client()
 bucket_name = "soccer-forecasting"
 folder_prefix = f'figures/{today}/'
 
+local_directory = 'figures'
+if not os.path.exists(local_directory):
+    os.makedirs(local_directory)
 
-blob_list_players = bucket.list_blobs(prefix=folder_prefix)
-files = []
-for blob in blob_list_players:
+# Download all files from the specified folder in the bucket
+blob_list = bucket.list_blobs(prefix=folder_prefix)
+for blob in blob_list:
     if not blob.name.endswith('/'):
+        # Extract the file name from the blob
         file_name = os.path.basename(blob.name)
-        local_file_path = os.path.join('figures', file_name)
-        blob.download_to_filename(local_file_path)
-        files.append(local_file_path)
+        # Download the file to the local directory
+        blob.download_to_filename(os.path.join(local_directory, file_name))
 
 # Define filenames
 xpoint_filename = 'xpt_table_English Premier League.png'
