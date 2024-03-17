@@ -30,7 +30,7 @@ shapely
 scikit-learn
 
 psycopg2-binary
-
+tweepy
 google-cloud-storage
 datetime
 pytz
