@@ -75,7 +75,7 @@ def main():
 
         return "No ongoing matches, but unable to determine the current match round."
 
-current_round = int(get_current_match_round(fixtures_data))
+    current_round = int(get_current_match_round(fixtures_data))
 
 
     if are_all_matches_finished(season_length, match_rounds, current_round):
