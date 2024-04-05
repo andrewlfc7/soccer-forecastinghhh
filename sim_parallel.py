@@ -130,7 +130,7 @@ def main():
 
     # Perform simulations in parallel
     match_probs = Parallel(n_jobs=num_jobs)(
-        delayed(simulate_match_current_round)(match, upcoming_games, model_params, 20)
+        delayed(simulate_match_current_round)(match, upcoming_games, model_params, 100)
         for match in upcoming_games['matchId']
     )
 
