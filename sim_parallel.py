@@ -176,7 +176,7 @@ def main():
     shots_data['expectedGoals'] = shots_data['expectedGoals'].fillna(0)
     shots_data = shots_data.replace({'Tottenham': 'Tottenham Hotspur'})
 
-    played_result,played_tables_drop_columns,unplayed_result,simulated_tables = run_simulations_parallel(20, shots_data, remaining_matches, model_params)
+    played_result,played_tables_drop_columns,unplayed_result,simulated_tables = run_simulations_parallel(100, shots_data, remaining_matches, model_params)
 
     played_result['matchId'] = played_result['matchId'].astype(int)
 
