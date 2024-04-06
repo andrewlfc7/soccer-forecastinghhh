@@ -26,6 +26,7 @@ EXPOSE 80
 
 
 
-CMD ["sh", "-c", "python3 main.py"]
+# CMD ["sh", "-c", "python3 main.py"]
+CMD ["sh", "-c", "python3 sim_parallel.py"]
 
 
