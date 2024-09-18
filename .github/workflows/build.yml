@@ -1,57 +1,57 @@
-on:
-  push:
-    branches: [main]
+# on:
+#   push:
+#     branches: [main]
 
-env:
-  PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  GAR_LOCATION: ${{ secrets.GAR_LOCATION }}
-  JOB: ${{ secrets.JOB }}
-  REGION: us-central1
+# env:
+#   PROJECT_ID: ${{ secrets.PROJECT_ID }}
+#   GAR_LOCATION: ${{ secrets.GAR_LOCATION }}
+#   JOB: ${{ secrets.JOB }}
+#   REGION: us-central1
 
-jobs:
-  deploy:
-    permissions:
-      contents: 'read'
-      id-token: 'write'
+# jobs:
+#   deploy:
+#     permissions:
+#       contents: 'read'
+#       id-token: 'write'
 
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v2
 
-      - name: Google Auth
-        id: auth
-        uses: google-github-actions/auth@v0
-        with:
-          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+#       - name: Google Auth
+#         id: auth
+#         uses: google-github-actions/auth@v0
+#         with:
+#           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
-      - name: Login to GAR
-        uses: docker/login-action@v3
-        with:
-          registry: '${{ env.GAR_LOCATION }}.gcr.io'
-          username: _json_key
-          password: ${{ secrets.GOOGLE_CREDENTIALS }}
+#       - name: Login to GAR
+#         uses: docker/login-action@v3
+#         with:
+#           registry: '${{ env.GAR_LOCATION }}.gcr.io'
+#           username: _json_key
+#           password: ${{ secrets.GOOGLE_CREDENTIALS }}
 
-      - name: Build and Push Container
-        run: |
-          # Fetch the content of the correct service account key file and store it in a temporary file
-          echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" > /tmp/google-credentials.json
+#       - name: Build and Push Container
+#         run: |
+#           # Fetch the content of the correct service account key file and store it in a temporary file
+#           echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" > /tmp/google-credentials.json
           
-          # Build the Docker image and include the correct service account key file
-          docker build \
-            --build-arg GOOGLE_APPLICATION_CREDENTIALS="/app/secrets/careful-aleph-398521-3eb70ef00c68.json" \
-            -t "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}" ./
+#           # Build the Docker image and include the correct service account key file
+#           docker build \
+#             --build-arg GOOGLE_APPLICATION_CREDENTIALS="/app/secrets/careful-aleph-398521-3eb70ef00c68.json" \
+#             -t "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}" ./
           
-          # Push the Docker image to the Container Registry
-          docker push "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}"
+#           # Push the Docker image to the Container Registry
+#           docker push "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}"
 
-      - name: Update Cloud Run Job Image
-        run: |
-          gcloud run jobs update ${{ env.JOB }} \
-            --image "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}" \
-            --region "${{ env.REGION }}"
+#       - name: Update Cloud Run Job Image
+#         run: |
+#           gcloud run jobs update ${{ env.JOB }} \
+#             --image "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}" \
+#             --region "${{ env.REGION }}"
 
-#      - name: Update Cloud Run Job Image
-#        run: |
-#          gcloud run jobs update ${{ env.JOB }} --image "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}"
+# #      - name: Update Cloud Run Job Image
+# #        run: |
+# #          gcloud run jobs update ${{ env.JOB }} --image "${{ env.GAR_LOCATION }}.gcr.io/${{ env.PROJECT_ID }}/${{ env.JOB }}:${{ github.sha }}"
 
