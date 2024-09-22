@@ -1,13 +1,11 @@
 use tokio;
 use rust_simulation::api_client::{get_league_fixtures, get_match_details};
-use rust_simulation::models::{LeagueResponse, MatchDetail};
-use std::env;
+// use rust_simulation::models::{LeagueResponse, MatchDetail};
+// use std::env;
 
 #[tokio::main]
 async fn main() {
-    // Example usage
-    let league_id = 47; // Replace with actual league ID
-
+    let league_id = 47;
     match get_league_fixtures(league_id).await {
         Ok(league_response) => {
             for fixture in league_response.league_overview_matches {
